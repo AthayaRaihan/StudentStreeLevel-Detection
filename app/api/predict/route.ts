@@ -11,6 +11,8 @@ const VALUE_TO_LEVEL: Record<number, string> = {
 };
 
 export async function POST(req: NextRequest) {
+  console.log("PYTHON_API", PYTHON_API);
+  console.log("ENV", process.env.PYTHON_API_URL);
   const body = await req.json();
   const rawAnswers: Record<string, number> = body.gejala ?? {};
 
