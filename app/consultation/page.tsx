@@ -2,6 +2,13 @@
 
 import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
+
+const DIAGNOSIS_TO_LEVEL: Record<string, string> = {
+  "Tidak Depresi": "normal",
+  Ringan:          "ringan",
+  Sedang:          "sedang",
+  Berat:           "berat",
+};
 import { AnimatePresence } from "framer-motion";
 import { symptoms, confidenceLevels } from "@/lib/symptoms";
 import ConsultationHeader from "@/components/consultation/ConsultationHeader";
@@ -16,6 +23,8 @@ const ConsultationPage = () => {
   const [currentSymptomIndex, setCurrentSymptomIndex] = useState(0);
   const [answers, setAnswers] = useState<{ [key: string]: number }>({});
   const [direction, setDirection] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const totalSymptoms = symptoms.length;
 
@@ -37,27 +46,30 @@ const ConsultationPage = () => {
     setAnswers((prev) => ({ ...prev, [symptomCode]: value }));
   };
 
-  /**
-   * Simulasi kalkulasi level stres dari jawaban.
-   * Nilai jawaban menggunakan skala confidenceLevels: 0 | 0.4 | 0.6 | 0.8 | 1.
-   * Rata-rata nilai dipetakan ke level:
-   *   0.00 – 0.25 → normal
-   *   0.25 – 0.50 → ringan
-   *   0.50 – 0.75 → sedang
-   *   0.75 – 1.00 → berat
-   */
-  const handleFinish = () => {
-    const values = Object.values(answers);
-    const avg = values.length > 0
-      ? values.reduce((sum, v) => sum + v, 0) / values.length
-      : 0;
+  const handleFinish = async () => {
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gejala: answers }),
+      });
 
-    let level = "normal";
-    if (avg >= 0.75) level = "berat";
-    else if (avg >= 0.50) level = "sedang";
-    else if (avg >= 0.25) level = "ringan";
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? "Terjadi kesalahan pada server.");
+      }
 
-    router.push(`/result?level=${level}`);
+      const data = await res.json();
+      sessionStorage.setItem("predictionResult", JSON.stringify(data.hasil));
+      const level = DIAGNOSIS_TO_LEVEL[data.hasil.final_diagnosis] ?? "normal";
+      router.push(`/result?level=${level}`);
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Terjadi kesalahan yang tidak diketahui.";
+      setError(msg);
+      setIsSubmitting(false);
+    }
   };
 
   const currentSymptom = symptoms[currentSymptomIndex];
@@ -118,6 +130,11 @@ const ConsultationPage = () => {
           />
 
           <div className="mt-12 w-full flex flex-col items-center gap-6">
+            {error && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 w-full text-center">
+                {error}
+              </p>
+            )}
             <NavigationButtons
               onPrev={handlePrev}
               onNext={handleNext}
@@ -125,6 +142,7 @@ const ConsultationPage = () => {
               isFirst={currentSymptomIndex === 0}
               isLast={currentSymptomIndex === totalSymptoms - 1}
               isNextDisabled={isNextDisabled}
+              isSubmitting={isSubmitting}
             />
             <QuestionIndicator
               total={totalSymptoms}

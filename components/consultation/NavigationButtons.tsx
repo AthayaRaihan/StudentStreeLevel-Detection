@@ -7,6 +7,7 @@ interface NavigationButtonsProps {
   isNextDisabled: boolean;
   isFirst: boolean;
   isLast: boolean;
+  isSubmitting?: boolean;
 }
 
 const NavigationButtons: React.FC<NavigationButtonsProps> = ({
@@ -16,12 +17,13 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
   isNextDisabled,
   isFirst,
   isLast,
+  isSubmitting = false,
 }) => {
   return (
     <div className="flex w-full justify-between items-center">
       <button
         onClick={onPrev}
-        disabled={isFirst}
+        disabled={isFirst || isSubmitting}
         className="px-8 py-3 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
       >
         Kembali
@@ -30,10 +32,10 @@ const NavigationButtons: React.FC<NavigationButtonsProps> = ({
       {isLast ? (
         <button
           onClick={onFinish}
-          disabled={isNextDisabled}
+          disabled={isNextDisabled || isSubmitting}
           className="px-8 py-3 rounded-lg font-semibold text-white bg-linear-to-r from-green-500 to-cyan-500 hover:opacity-90 shadow-lg transform hover:scale-105 transition-all disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
         >
-          Selesai Konsultasi
+          {isSubmitting ? "Menganalisis..." : "Selesai Konsultasi"}
         </button>
       ) : (
         <button

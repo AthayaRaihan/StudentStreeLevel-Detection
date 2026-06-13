@@ -6,6 +6,7 @@ import { resultsData, ResultCategory } from "@/lib/results";
 
 import ResultHeader from "@/components/result/ResultHeader";
 import ResultCard from "@/components/result/ResultCard";
+import AnalysisDetailCard, { PredictionDetail } from "@/components/result/AnalysisDetailCard";
 import MeaningCard from "@/components/result/MeaningCard";
 import RecommendationCard from "@/components/result/RecommendationCard";
 import StudentTipsCard from "@/components/result/StudentTipsCard";
@@ -15,18 +16,23 @@ import ActionButtons from "@/components/result/ActionButtons";
 const ResultPage = () => {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<ResultCategory | null>(null);
+  const [detail, setDetail] = useState<PredictionDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulasi pengambilan hasil dari URL parameter atau state management
-    // Dalam aplikasi nyata, ini bisa datang dari query param, context, atau local storage
-    const resultKey = searchParams.get("level") || "sedang"; // Default ke 'sedang' untuk demo
+    const resultKey = searchParams.get("level") || "normal";
+    setResult(resultsData[resultKey] ?? resultsData["normal"]);
 
-    if (resultsData[resultKey]) {
-      setResult(resultsData[resultKey]);
-    } else {
-      setResult(resultsData["normal"]); // Fallback
+    const stored = sessionStorage.getItem("predictionResult");
+    if (stored) {
+      try {
+        setDetail(JSON.parse(stored));
+      } catch {
+        // ignore malformed data
+      }
+      sessionStorage.removeItem("predictionResult");
     }
+
     setIsLoading(false);
   }, [searchParams]);
 
@@ -49,7 +55,7 @@ const ResultPage = () => {
   return (
     <div className="bg-gray-50/80 min-h-screen font-sans">
       <div
-        className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white via-blue-50 to-indigo-100 -z-10"
+        className="no-print absolute top-0 left-0 w-full h-full bg-linear-to-br from-white via-blue-50 to-indigo-100 -z-10"
         style={{
           clipPath: "polygon(0 0, 100% 0, 100% 40%, 0 70%)",
         }}
@@ -58,6 +64,7 @@ const ResultPage = () => {
         <ResultHeader />
         <main className="flex flex-col items-center">
           <ResultCard result={result} />
+          {detail && <AnalysisDetailCard detail={detail} />}
           <MeaningCard meaning={result.meaning} />
           <RecommendationCard advice={result.advice} />
           <StudentTipsCard />
