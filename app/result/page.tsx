@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { resultsData, ResultCategory } from "@/lib/results";
 import { FormData } from "@/components/biodata/types";
@@ -15,7 +15,7 @@ import StudentTipsCard from "@/components/result/StudentTipsCard";
 import DisclaimerCard from "@/components/result/DisclaimerCard";
 import ActionButtons from "@/components/result/ActionButtons";
 
-const ResultPage = () => {
+const ResultContent = () => {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<ResultCategory | null>(null);
   const [detail, setDetail] = useState<PredictionDetail | null>(null);
@@ -90,6 +90,18 @@ const ResultPage = () => {
         </main>
       </div>
     </div>
+  );
+};
+
+const ResultPage = () => {
+  return (
+    <Suspense fallback={
+      <div className="w-full min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-gray-600">Memuat hasil...</p>
+      </div>
+    }>
+      <ResultContent />
+    </Suspense>
   );
 };
 
