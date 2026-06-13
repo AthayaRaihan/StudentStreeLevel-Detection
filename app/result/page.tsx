@@ -7,6 +7,7 @@ import { FormData } from "@/components/biodata/types";
 
 import ResultHeader from "@/components/result/ResultHeader";
 import ResultCard from "@/components/result/ResultCard";
+import AnalysisDetailCard, { PredictionDetail } from "@/components/result/AnalysisDetailCard";
 import UserBiodataCard from "@/components/result/UserBiodataCard";
 import MeaningCard from "@/components/result/MeaningCard";
 import RecommendationCard from "@/components/result/RecommendationCard";
@@ -17,6 +18,21 @@ import ActionButtons from "@/components/result/ActionButtons";
 const ResultPage = () => {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<ResultCategory | null>(null);
+  const [detail, setDetail] = useState<PredictionDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const resultKey = searchParams.get("level") || "normal";
+    setResult(resultsData[resultKey] ?? resultsData["normal"]);
+
+    const stored = sessionStorage.getItem("predictionResult");
+    if (stored) {
+      try {
+        setDetail(JSON.parse(stored));
+      } catch {
+        // ignore malformed data
+      }
+      sessionStorage.removeItem("predictionResult");
   const [biodata, setBiodata] = useState<FormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -69,6 +85,7 @@ const ResultPage = () => {
           {biodata && <UserBiodataCard biodata={biodata} />}
 
           <ResultCard result={result} />
+          {detail && <AnalysisDetailCard detail={detail} />}
           <MeaningCard meaning={result.meaning} />
           <RecommendationCard advice={result.advice} />
           <StudentTipsCard />
