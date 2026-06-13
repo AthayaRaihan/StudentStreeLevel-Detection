@@ -57,7 +57,7 @@ const FloatingNavbar = () => {
                 ))}
               </div>
               <Link
-                href="/consultation"
+                href="/biodata"
                 className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors"
               >
                 Consultation
@@ -106,7 +106,7 @@ const FloatingNavbar = () => {
                   </Link>
                 ))}
                 <Link
-                  href="/consultation"
+                  href="/biodata"
                   className="w-full mt-4 px-4 py-3 text-center text-lg font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >

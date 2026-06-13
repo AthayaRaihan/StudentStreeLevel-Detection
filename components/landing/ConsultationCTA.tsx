@@ -26,7 +26,7 @@ const ConsultationCTA = () => {
             </p>
             <div className="mt-8">
               <Link
-                href="/consultation"
+                href="/biodata"
                 className="inline-block px-10 py-5 text-xl font-bold text-blue-600 bg-white rounded-full shadow-2xl transform hover:scale-110 transition-transform duration-300 ease-in-out"
               >
                 Start Your Free Consultation
