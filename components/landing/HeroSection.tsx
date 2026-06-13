@@ -76,7 +76,7 @@ const HeroSection = () => {
           className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
           <Link
-            href="/consultation"
+            href="/biodata"
             className="px-8 py-4 text-lg font-semibold text-white bg-blue-600 rounded-full shadow-lg hover:bg-blue-700 transition-colors transform hover:scale-105"
           >
             Start Consultation
