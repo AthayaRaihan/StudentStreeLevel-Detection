@@ -19,10 +19,12 @@ const ResultPage = () => {
   const searchParams = useSearchParams();
   const [result, setResult] = useState<ResultCategory | null>(null);
   const [detail, setDetail] = useState<PredictionDetail | null>(null);
+  const [biodata, setBiodata] = useState<FormData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const resultKey = searchParams.get("level") || "normal";
+    // Baca hasil konsultasi dari URL param
+    const resultKey = searchParams.get("level") || "sedang";
     setResult(resultsData[resultKey] ?? resultsData["normal"]);
 
     const stored = sessionStorage.getItem("predictionResult");
@@ -33,13 +35,7 @@ const ResultPage = () => {
         // ignore malformed data
       }
       sessionStorage.removeItem("predictionResult");
-  const [biodata, setBiodata] = useState<FormData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Baca hasil konsultasi dari URL param
-    const resultKey = searchParams.get("level") || "sedang";
-    setResult(resultsData[resultKey] ?? resultsData["normal"]);
+    }
 
     // Baca biodata dari sessionStorage (hanya valid dalam satu session tab)
     try {
